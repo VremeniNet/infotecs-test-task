@@ -41,7 +41,7 @@
 ### Установка
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/VremeniNet/infotecs-test-task.git
 cd infotecs-test-task
 npm ci
 ```

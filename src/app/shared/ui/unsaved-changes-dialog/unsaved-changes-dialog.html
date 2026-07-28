@@ -1,0 +1,17 @@
+<section class="dialog">
+  <p class="dialog__label">Несохранённые изменения</p>
+
+  <h2 mat-dialog-title>Покинуть страницу?</h2>
+
+  <mat-dialog-content>
+    <p>Изменения в рецепте ещё не сохранены. При выходе введённые данные будут потеряны.</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="leave()">Выйти без сохранения</button>
+
+    <button mat-flat-button class="continue-button" type="button" (click)="stay()">
+      Продолжить редактирование
+    </button>
+  </mat-dialog-actions>
+</section>

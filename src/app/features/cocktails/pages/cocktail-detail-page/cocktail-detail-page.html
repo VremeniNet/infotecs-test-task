@@ -1,0 +1,171 @@
+@if (cocktail(); as currentCocktail) {
+  <article class="recipe">
+    <div class="recipe__navigation">
+      <a class="back-link" routerLink="/cocktails">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
+        Вернуться в коллекцию
+      </a>
+
+      <a
+        mat-stroked-button
+        class="edit-button"
+        [routerLink]="['/cocktails', currentCocktail.id, 'edit']"
+      >
+        <mat-icon>edit</mat-icon>
+        Редактировать
+      </a>
+    </div>
+
+    <header class="recipe-hero">
+      <div class="recipe-hero__content">
+        <p class="eyebrow">Bar Notes / Рецепт</p>
+
+        <h1>{{ currentCocktail.name }}</h1>
+
+        <p class="recipe-hero__description">
+          {{ currentCocktail.description }}
+        </p>
+
+        <dl class="recipe-meta">
+          <div>
+            <dt>Добавлен</dt>
+
+            <dd>
+              <time [attr.datetime]="currentCocktail.createdAt">
+                {{ currentCocktail.createdAt | date: 'dd.MM.yyyy' }}
+              </time>
+            </dd>
+          </div>
+
+          <div>
+            <dt>Обновлён</dt>
+
+            <dd>
+              <time [attr.datetime]="currentCocktail.updatedAt">
+                {{ currentCocktail.updatedAt | date: 'dd.MM.yyyy' }}
+              </time>
+            </dd>
+          </div>
+
+          <div>
+            <dt>Приготовление</dt>
+
+            <dd>
+              {{ currentCocktail.steps.length }}
+              этапов
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <figure class="recipe-hero__media">
+        @if (currentCocktail.finalImageUrl) {
+          <img [src]="currentCocktail.finalImageUrl" [alt]="currentCocktail.name" />
+        } @else {
+          <div class="image-placeholder">
+            <mat-icon aria-hidden="true"> local_bar </mat-icon>
+
+            <span> Изображение результата не добавлено </span>
+          </div>
+        }
+
+        <figcaption>
+          <span>Готовый результат</span>
+          <strong>{{ currentCocktail.name }}</strong>
+        </figcaption>
+      </figure>
+    </header>
+
+    <section class="preparation" aria-labelledby="preparation-title">
+      <header class="section-heading">
+        <div>
+          <p>Процесс приготовления</p>
+
+          <h2 id="preparation-title">Шаг за шагом.</h2>
+        </div>
+
+        <p class="section-heading__description">
+          Следуйте этапам по порядку, чтобы получить задуманный вкус и правильную подачу.
+        </p>
+      </header>
+
+      @if (currentCocktail.steps.length === 0) {
+        <div class="empty-steps">
+          <mat-icon aria-hidden="true"> format_list_numbered </mat-icon>
+
+          <div>
+            <h3>Этапы ещё не добавлены</h3>
+
+            <p>Отредактируйте рецепт и добавьте процесс приготовления.</p>
+
+            <a
+              mat-flat-button
+              class="primary-button"
+              [routerLink]="['/cocktails', currentCocktail.id, 'edit']"
+            >
+              Добавить этапы
+            </a>
+          </div>
+        </div>
+      } @else {
+        <ol class="steps">
+          @for (step of currentCocktail.steps; track step.id; let index = $index) {
+            <li class="step">
+              <div class="step__number">
+                {{ (index + 1).toString().padStart(2, '0') }}
+              </div>
+
+              <div class="step__content">
+                <p class="step__label">Этап {{ index + 1 }}</p>
+
+                <h3>{{ step.title }}</h3>
+
+                <p class="step__description">
+                  {{ step.description }}
+                </p>
+              </div>
+
+              <figure class="step__media">
+                @if (step.imageUrl) {
+                  <img [src]="step.imageUrl" [alt]="step.title" />
+                } @else {
+                  <div class="step-placeholder">
+                    <mat-icon aria-hidden="true"> add_photo_alternate </mat-icon>
+
+                    <span> Фотография этапа не добавлена </span>
+                  </div>
+                }
+              </figure>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
+    <footer class="recipe-footer">
+      <div>
+        <p>Хотите что-то изменить?</p>
+        <h2>Дополните или обновите рецепт.</h2>
+      </div>
+
+      <a
+        mat-flat-button
+        class="primary-button"
+        [routerLink]="['/cocktails', currentCocktail.id, 'edit']"
+      >
+        <mat-icon>edit</mat-icon>
+        Редактировать рецепт
+      </a>
+    </footer>
+  </article>
+} @else {
+  <section class="not-found">
+    <p class="eyebrow">Ошибка 404</p>
+
+    <h1>Рецепт не найден</h1>
+
+    <p>Возможно, рецепт был удалён или ссылка больше неактуальна.</p>
+
+    <a mat-flat-button class="primary-button" routerLink="/cocktails"> Вернуться в коллекцию </a>
+  </section>
+}

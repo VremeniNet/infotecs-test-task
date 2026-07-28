@@ -1,0 +1,351 @@
+@if (recipeNotFound()) {
+  <section class="not-found">
+    <p class="eyebrow">Ошибка 404</p>
+
+    <h1>Рецепт не найден</h1>
+
+    <p>Возможно, рецепт был удалён или ссылка больше неактуальна.</p>
+
+    <a mat-flat-button class="primary-button" routerLink="/cocktails"> Вернуться в коллекцию </a>
+  </section>
+} @else {
+  <section class="editor-page">
+    @if (isProcessingImage()) {
+      <mat-progress-bar class="image-progress" mode="indeterminate" />
+    }
+
+    <header class="editor-header">
+      <div>
+        <a class="back-link" routerLink="/cocktails">
+          <mat-icon aria-hidden="true"> arrow_back </mat-icon>
+
+          Вернуться в коллекцию
+        </a>
+
+        <p class="eyebrow">
+          Bar Notes /
+          {{ isEditMode ? 'Редактирование' : 'Новый рецепт' }}
+        </p>
+
+        <h1>
+          {{ isEditMode ? 'Обновить рецепт.' : 'Добавить коктейль.' }}
+        </h1>
+      </div>
+
+      <p class="editor-header__description">
+        Добавьте основную информацию, фотографию готового напитка и подробно опишите процесс
+        приготовления.
+      </p>
+    </header>
+
+    <form class="editor-form" [formGroup]="form" (ngSubmit)="save()">
+      <section class="form-section">
+        <header class="form-section__header">
+          <div class="section-number">01</div>
+
+          <div>
+            <p>Основная информация</p>
+            <h2>Название и описание</h2>
+          </div>
+        </header>
+
+        <div class="basic-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Название коктейля</mat-label>
+
+            <input
+              matInput
+              formControlName="name"
+              maxlength="100"
+              placeholder="Например, Cherry Americano"
+            />
+
+            <mat-hint align="end"> {{ form.controls.name.value.length }}/100 </mat-hint>
+
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error> Укажите название коктейля </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Описание коктейля</mat-label>
+
+            <textarea
+              matInput
+              formControlName="description"
+              rows="6"
+              maxlength="1000"
+              placeholder="Опишите вкус, аромат и характер напитка"
+            ></textarea>
+
+            <mat-hint align="end"> {{ form.controls.description.value.length }}/1000 </mat-hint>
+
+            @if (
+              form.controls.description.hasError('required') && form.controls.description.touched
+            ) {
+              <mat-error> Добавьте описание коктейля </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="form-section__header">
+          <div class="section-number">02</div>
+
+          <div>
+            <p>Готовый результат</p>
+            <h2>Главная фотография</h2>
+          </div>
+        </header>
+
+        <div class="image-editor">
+          <div class="image-editor__description">
+            <h3>Изображение коктейля</h3>
+
+            <p>
+              Используйте вертикальную или квадратную фотографию. Она появится в каталоге и на
+              странице рецепта.
+            </p>
+
+            <input
+              #finalImageInput
+              class="visually-hidden"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="selectFinalImage($event)"
+            />
+
+            <div class="image-editor__actions">
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="isProcessingImage()"
+                (click)="finalImageInput.click()"
+              >
+                <mat-icon>upload</mat-icon>
+
+                {{
+                  form.controls.finalImageUrl.value ? 'Заменить фотографию' : 'Выбрать фотографию'
+                }}
+              </button>
+
+              @if (form.controls.finalImageUrl.value) {
+                <button mat-button class="remove-button" type="button" (click)="removeFinalImage()">
+                  Удалить
+                </button>
+              }
+            </div>
+
+            <span class="upload-hint"> JPG, PNG или WebP, не более 10 МБ </span>
+          </div>
+
+          <div class="image-preview">
+            @if (form.controls.finalImageUrl.value; as imageUrl) {
+              <img [src]="imageUrl" alt="Предпросмотр готового коктейля" />
+            } @else {
+              <div class="image-placeholder">
+                <mat-icon aria-hidden="true"> add_photo_alternate </mat-icon>
+
+                <span>Фотография не выбрана</span>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <header class="form-section__header steps-heading">
+          <div class="section-number">03</div>
+
+          <div>
+            <p>Приготовление</p>
+            <h2>Пошаговый процесс</h2>
+          </div>
+
+          <button mat-stroked-button type="button" (click)="addStep()">
+            <mat-icon>add</mat-icon>
+            Добавить этап
+          </button>
+        </header>
+
+        <div class="steps-editor" formArrayName="steps">
+          @for (
+            stepGroup of steps.controls;
+            track stepGroup.controls.id.value;
+            let index = $index
+          ) {
+            <article class="step-editor" [formGroupName]="index">
+              <header class="step-editor__header">
+                <div>
+                  <span class="step-editor__number">
+                    {{ (index + 1).toString().padStart(2, '0') }}
+                  </span>
+
+                  <div>
+                    <p>Этап приготовления</p>
+                    <h3>Шаг {{ index + 1 }}</h3>
+                  </div>
+                </div>
+
+                <div class="step-editor__controls">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Переместить выше"
+                    [disabled]="index === 0"
+                    (click)="moveStepUp(index)"
+                  >
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    type="button"
+                    matTooltip="Переместить ниже"
+                    [disabled]="index === steps.length - 1"
+                    (click)="moveStepDown(index)"
+                  >
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    class="remove-icon"
+                    type="button"
+                    matTooltip="Удалить этап"
+                    [disabled]="steps.length === 1"
+                    (click)="removeStep(index)"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </header>
+
+              <div class="step-editor__body">
+                <div class="step-fields">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Название этапа</mat-label>
+
+                    <input
+                      matInput
+                      formControlName="title"
+                      maxlength="100"
+                      placeholder="Например, Подготовьте бокал"
+                    />
+
+                    @if (
+                      stepGroup.controls.title.hasError('required') &&
+                      stepGroup.controls.title.touched
+                    ) {
+                      <mat-error> Укажите название этапа </mat-error>
+                    }
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label> Описание процесса </mat-label>
+
+                    <textarea
+                      matInput
+                      formControlName="description"
+                      rows="6"
+                      maxlength="700"
+                      placeholder="Подробно опишите действия на этом этапе"
+                    ></textarea>
+
+                    <mat-hint align="end">
+                      {{ stepGroup.controls.description.value.length }}/700
+                    </mat-hint>
+
+                    @if (
+                      stepGroup.controls.description.hasError('required') &&
+                      stepGroup.controls.description.touched
+                    ) {
+                      <mat-error> Добавьте описание этапа </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+
+                <div class="step-image">
+                  <input
+                    #stepImageInput
+                    class="visually-hidden"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    (change)="selectStepImage($event, index)"
+                  />
+
+                  <div class="step-image__preview">
+                    @if (stepGroup.controls.imageUrl.value; as stepImageUrl) {
+                      <img [src]="stepImageUrl" [alt]="'Фотография этапа ' + (index + 1)" />
+                    } @else {
+                      <div class="step-placeholder">
+                        <mat-icon aria-hidden="true"> photo_camera </mat-icon>
+
+                        <span> Фотография этапа </span>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="step-image__actions">
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      [disabled]="isProcessingImage()"
+                      (click)="stepImageInput.click()"
+                    >
+                      <mat-icon>upload</mat-icon>
+
+                      {{ stepGroup.controls.imageUrl.value ? 'Заменить' : 'Добавить фото' }}
+                    </button>
+
+                    @if (stepGroup.controls.imageUrl.value) {
+                      <button
+                        mat-button
+                        class="remove-button"
+                        type="button"
+                        (click)="removeStepImage(index)"
+                      >
+                        Удалить
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+
+        <button mat-stroked-button class="add-step-button" type="button" (click)="addStep()">
+          <mat-icon>add</mat-icon>
+          Добавить ещё один этап
+        </button>
+      </section>
+
+      <footer class="form-actions">
+        <div>
+          <p>
+            {{ form.dirty ? 'Есть несохранённые изменения' : 'Изменений пока нет' }}
+          </p>
+
+          <span> После сохранения рецепт появится в коллекции. </span>
+        </div>
+
+        <div class="form-actions__buttons">
+          <a mat-button routerLink="/cocktails"> Отмена </a>
+
+          <button
+            mat-flat-button
+            class="save-button"
+            type="submit"
+            [disabled]="isProcessingImage()"
+          >
+            <mat-icon>save</mat-icon>
+
+            {{ isEditMode ? 'Сохранить изменения' : 'Добавить рецепт' }}
+          </button>
+        </div>
+      </footer>
+    </form>
+  </section>
+}

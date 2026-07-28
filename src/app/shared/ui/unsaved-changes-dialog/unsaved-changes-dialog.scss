@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.dialog {
+  padding-top: 8px;
+
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.dialog__label {
+  margin: 0;
+  padding-inline: 24px;
+
+  color: var(--wine);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+h2[mat-dialog-title] {
+  margin-top: 8px;
+
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+mat-dialog-content {
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+mat-dialog-content p {
+  margin: 0;
+}
+
+mat-dialog-actions {
+  gap: 6px;
+  padding: 14px 24px 24px;
+}
+
+button.continue-button {
+  min-height: 44px;
+  padding-inline: 18px;
+
+  border-radius: 999px;
+  background: var(--wine);
+  color: var(--surface);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  mat-dialog-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  mat-dialog-actions button {
+    width: 100%;
+  }
+}

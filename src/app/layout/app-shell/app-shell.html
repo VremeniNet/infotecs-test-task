@@ -1,0 +1,29 @@
+<header class="header">
+  <div class="header__inner">
+    <a class="brand" routerLink="/" aria-label="Bar Notes — главная страница">
+      <strong>Bar Notes</strong>
+      <span>барная карта</span>
+    </a>
+
+    <nav class="navigation" aria-label="Основная навигация">
+      <a
+        routerLink="/"
+        routerLinkActive="navigation__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Главная
+      </a>
+
+      <a routerLink="/cocktails" routerLinkActive="navigation__link--active"> Коллекция </a>
+    </nav>
+
+    <a class="create-link" routerLink="/cocktails/new">
+      Добавить рецепт
+      <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <router-outlet />
+</main>

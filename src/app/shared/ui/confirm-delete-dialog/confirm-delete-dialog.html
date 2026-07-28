@@ -1,0 +1,19 @@
+<div class="dialog">
+  <p class="dialog__label">Удаление рецепта</p>
+
+  <h2 mat-dialog-title>Удалить «{{ data.cocktailName }}»?</h2>
+
+  <mat-dialog-content>
+    <p>Рецепт и все добавленные к нему изображения будут удалены из локального хранилища.</p>
+
+    <p class="dialog__warning">Это действие нельзя отменить.</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Отмена</button>
+
+    <button mat-flat-button class="delete-button" type="button" (click)="confirm()">
+      Удалить рецепт
+    </button>
+  </mat-dialog-actions>
+</div>

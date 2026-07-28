@@ -1,0 +1,113 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$rose-palette,
+        tertiary: mat.$azure-palette,
+      ),
+      typography: Manrope,
+      density: 0,
+    )
+  );
+
+  @include mat.strong-focus-indicators();
+}
+
+:root {
+  --page: #f3ede4;
+  --surface: #fffaf4;
+  --surface-muted: #eadfd4;
+
+  --ink: #302027;
+  --ink-muted: #796d71;
+
+  --wine: #963f50;
+  --wine-dark: #702c3b;
+  --wine-soft: #ead1d5;
+
+  --apricot: #e6a06f;
+  --apricot-soft: #f3d8c4;
+
+  --bottle-blue: #315c6b;
+  --blue-soft: #d4e0e2;
+
+  --line: #d8ccc0;
+  --danger: #a7333f;
+
+  --font-display: 'Lora', Georgia, serif;
+  --font-body: 'Manrope', sans-serif;
+
+  --content-width: 1440px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+
+  font-family: var(--font-body);
+  font-size: 16px;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--wine);
+  color: var(--surface);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(49, 92, 107, 0.3);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

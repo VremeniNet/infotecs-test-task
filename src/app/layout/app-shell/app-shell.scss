@@ -1,0 +1,171 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.header {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+
+  border-bottom: 1px solid var(--line);
+  background: rgba(243, 237, 228, 0.92);
+
+  backdrop-filter: blur(14px);
+}
+
+.header__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  width: min(100% - 48px, var(--content-width));
+  min-height: 78px;
+  margin-inline: auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  justify-self: start;
+  gap: 11px;
+
+  width: fit-content;
+
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand strong {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.brand span {
+  color: var(--ink-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.navigation a {
+  position: relative;
+
+  padding-block: 29px;
+
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: color 180ms ease;
+}
+
+.navigation a::after {
+  position: absolute;
+  right: 0;
+  bottom: 21px;
+  left: 0;
+
+  height: 2px;
+
+  border-radius: 999px;
+  background: var(--wine);
+
+  content: '';
+
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 220ms ease;
+}
+
+.navigation a:hover,
+.navigation .navigation__link--active {
+  color: var(--ink);
+}
+
+.navigation a:hover::after,
+.navigation .navigation__link--active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.create-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 10px;
+
+  min-height: 44px;
+  padding-inline: 18px;
+
+  border: 1px solid var(--wine);
+  border-radius: 999px;
+
+  color: var(--wine);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.create-link span {
+  font-size: 16px;
+  transition: transform 180ms ease;
+}
+
+.create-link:hover {
+  background: var(--wine);
+  color: var(--surface);
+
+  transform: translateY(-1px);
+}
+
+.create-link:hover span {
+  transform: translate(2px, -2px);
+}
+
+main {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .header__inner {
+    grid-template-columns: 1fr auto;
+    width: min(100% - 28px, var(--content-width));
+    min-height: 68px;
+  }
+
+  .navigation {
+    display: none;
+  }
+
+  .brand span {
+    display: none;
+  }
+
+  .create-link {
+    width: 42px;
+    min-height: 42px;
+    padding: 0;
+
+    font-size: 0;
+  }
+
+  .create-link span {
+    font-size: 17px;
+  }
+}

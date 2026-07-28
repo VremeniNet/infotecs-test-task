@@ -1,0 +1,251 @@
+<section class="catalog-page">
+  <header class="catalog-header">
+    <div class="catalog-header__title">
+      <p class="eyebrow">Bar Notes / Коллекция</p>
+
+      <h1>
+        Барная карта
+        <em>ваших рецептов.</em>
+      </h1>
+    </div>
+
+    <div class="catalog-header__summary">
+      <strong>{{ cocktailStore.totalCocktails() }}</strong>
+
+      <p>рецептов сохранено в вашей личной коллекции</p>
+    </div>
+  </header>
+
+  <section class="catalog-toolbar" aria-label="Управление каталогом">
+    <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Найти коктейль</mat-label>
+
+      <mat-icon matPrefix>search</mat-icon>
+
+      <input
+        matInput
+        type="search"
+        autocomplete="off"
+        placeholder="Название или описание"
+        [value]="searchQuery()"
+        (input)="updateSearchQuery($event)"
+      />
+
+      @if (searchQuery()) {
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          aria-label="Очистить поиск"
+          (click)="clearSearch()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <div class="catalog-toolbar__actions">
+      <span class="results"> Найдено: {{ filteredCocktails().length }} </span>
+
+      <mat-button-toggle-group
+        aria-label="Вид каталога"
+        [value]="viewMode()"
+        (change)="changeViewMode($event)"
+      >
+        <mat-button-toggle value="grid" matTooltip="Карточки" aria-label="Показать карточки">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+
+        <mat-button-toggle value="table" matTooltip="Таблица" aria-label="Показать таблицу">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <a mat-flat-button class="create-button" routerLink="/cocktails/new">
+        <mat-icon>add</mat-icon>
+        Новый рецепт
+      </a>
+    </div>
+  </section>
+
+  @if (filteredCocktails().length === 0) {
+    <section class="empty-state">
+      <mat-icon aria-hidden="true">search_off</mat-icon>
+
+      <div>
+        <p class="empty-state__label">Нет результатов</p>
+
+        <h2>Коктейли не найдены</h2>
+
+        <p>Измените поисковый запрос или добавьте новый рецепт в коллекцию.</p>
+
+        <div class="empty-state__actions">
+          @if (searchQuery()) {
+            <button mat-button type="button" (click)="clearSearch()">Очистить поиск</button>
+          }
+
+          <a mat-flat-button class="create-button" routerLink="/cocktails/new"> Добавить рецепт </a>
+        </div>
+      </div>
+    </section>
+  } @else if (viewMode() === 'grid') {
+    <section class="recipe-grid" aria-label="Карточки коктейлей">
+      @for (cocktail of filteredCocktails(); track cocktail.id; let index = $index) {
+        <article class="recipe-card">
+          <a
+            class="recipe-card__media"
+            [routerLink]="['/cocktails', cocktail.id]"
+            [attr.aria-label]="'Открыть рецепт ' + cocktail.name"
+          >
+            @if (cocktail.finalImageUrl) {
+              <img [src]="cocktail.finalImageUrl" [alt]="cocktail.name" />
+            } @else {
+              <div class="image-placeholder">
+                <mat-icon aria-hidden="true"> local_bar </mat-icon>
+
+                <span>Изображение не добавлено</span>
+              </div>
+            }
+
+            <span class="recipe-card__index"> № {{ index + 1 }} </span>
+          </a>
+
+          <div class="recipe-card__content">
+            <div class="recipe-card__meta">
+              <time [attr.datetime]="cocktail.createdAt">
+                {{ cocktail.createdAt | date: 'dd.MM.yyyy' }}
+              </time>
+
+              <span> {{ cocktail.steps.length }} этапов </span>
+            </div>
+
+            <h2>
+              <a [routerLink]="['/cocktails', cocktail.id]">
+                {{ cocktail.name }}
+              </a>
+            </h2>
+
+            <p class="recipe-card__description">
+              {{ cocktail.description }}
+            </p>
+
+            <footer class="recipe-card__footer">
+              <a class="open-link" [routerLink]="['/cocktails', cocktail.id]">
+                Открыть рецепт
+                <span aria-hidden="true">→</span>
+              </a>
+
+              <div class="recipe-card__actions">
+                <a
+                  mat-icon-button
+                  matTooltip="Редактировать"
+                  [routerLink]="['/cocktails', cocktail.id, 'edit']"
+                  [attr.aria-label]="'Редактировать ' + cocktail.name"
+                >
+                  <mat-icon>edit</mat-icon>
+                </a>
+
+                <button
+                  mat-icon-button
+                  class="delete-icon"
+                  type="button"
+                  matTooltip="Удалить"
+                  [attr.aria-label]="'Удалить ' + cocktail.name"
+                  (click)="openDeleteDialog(cocktail)"
+                >
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </footer>
+          </div>
+        </article>
+      }
+    </section>
+  } @else {
+    <section class="table-wrapper" aria-label="Таблица коктейлей">
+      <table mat-table class="cocktail-table" [dataSource]="filteredCocktails()">
+        <ng-container matColumnDef="image">
+          <th mat-header-cell *matHeaderCellDef>Изображение</th>
+
+          <td mat-cell *matCellDef="let cocktail">
+            <a
+              class="table-image"
+              [routerLink]="['/cocktails', cocktail.id]"
+              [attr.aria-label]="'Открыть рецепт ' + cocktail.name"
+            >
+              @if (cocktail.finalImageUrl) {
+                <img [src]="cocktail.finalImageUrl" [alt]="cocktail.name" />
+              } @else {
+                <mat-icon aria-hidden="true"> local_bar </mat-icon>
+              }
+            </a>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Дата добавления</th>
+
+          <td mat-cell *matCellDef="let cocktail">
+            <time [attr.datetime]="cocktail.createdAt">
+              {{ cocktail.createdAt | date: 'dd.MM.yyyy' }}
+            </time>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Название</th>
+
+          <td mat-cell *matCellDef="let cocktail">
+            <a class="table-name" [routerLink]="['/cocktails', cocktail.id]">
+              {{ cocktail.name }}
+            </a>
+
+            <span class="table-description">
+              {{ cocktail.description }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="steps">
+          <th mat-header-cell *matHeaderCellDef>Этапы</th>
+
+          <td mat-cell *matCellDef="let cocktail">
+            {{ cocktail.steps.length }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Действия</th>
+
+          <td mat-cell *matCellDef="let cocktail">
+            <div class="table-actions">
+              <a
+                mat-icon-button
+                matTooltip="Редактировать"
+                [routerLink]="['/cocktails', cocktail.id, 'edit']"
+                [attr.aria-label]="'Редактировать ' + cocktail.name"
+              >
+                <mat-icon>edit</mat-icon>
+              </a>
+
+              <button
+                mat-icon-button
+                class="delete-icon"
+                type="button"
+                matTooltip="Удалить"
+                [attr.aria-label]="'Удалить ' + cocktail.name"
+                (click)="openDeleteDialog(cocktail)"
+              >
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+        <tr mat-row *matRowDef="let cocktail; columns: displayedColumns"></tr>
+      </table>
+    </section>
+  }
+</section>
